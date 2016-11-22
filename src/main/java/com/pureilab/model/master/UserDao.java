@@ -12,7 +12,7 @@ public interface UserDao extends PagingAndSortingRepository<User, Long> {
 //public interface CountryDao extends JpaRepository<Country, Long> {
 
 
-    public User findByUsername(String code);
+    public User findByUsername(String username);
 
     public User findByUsernameAndPassword(String username, String password);
 

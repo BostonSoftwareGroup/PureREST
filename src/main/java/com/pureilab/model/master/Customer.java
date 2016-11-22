@@ -2,6 +2,9 @@ package com.pureilab.model.master;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import org.springframework.data.domain.Persistable;
+
+import java.io.Serializable;
 
 /**
  * Created by Julian on 9/28/2016.
@@ -50,6 +53,7 @@ public class Customer {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
 
     public long getId() {
         return id;

@@ -29,8 +29,15 @@ public class APIController {
     SecurityController securityController;
 
     @Autowired
+    UserController userController;
+
+    @Autowired
+    CustomerController customerController;
+
+    @Autowired
     CountryController countryController;
 
+    // -------------- Security Related Controllers --------------
     @CrossOrigin
     @RequestMapping(value = "/sign-up", method = RequestMethod.POST)
     //@ResponseBody
@@ -59,61 +66,58 @@ public class APIController {
         return securityController.test(json);
     }
 
-    //@CrossOrigin(origins = "http://192.168.1.12:8080")
+    // -------------- Customer Controllers --------------
     @CrossOrigin
-    @RequestMapping("/get-all2")
-    //@ResponseBody
-    public Iterable getAllObjects2() {
-        return countryController.getAllObjects2();
-    }
-
-    //@CrossOrigin(origins = "http://192.168.1.12:8080")
-    @CrossOrigin
-    @RequestMapping("/get-all")
-    //@ResponseBody
-    public APIResponse getAllObjects() {
-        return countryController.getAllObjects();
-    }
-
     @RequestMapping(value = "/create-customer", method = RequestMethod.POST)
     //@ResponseBody
     public APIResponse createCustomer(@RequestBody String json) {
-        return countryController.createCustomer(json);
+        return customerController.createCustomer(json);
     }
 
-    //@CrossOrigin(origins = "http://192.168.1.12:8080")
     @CrossOrigin
-    @RequestMapping("/customers")
-    //@ResponseBody
-    public APIResponse getCustomers() {
-       return countryController.getCustomers();
+    @RequestMapping(value = "/customers", method = RequestMethod.POST)
+    public APIResponse getCustomers(@RequestBody String json) {
+        return customerController.getCustomers(json);
+    }
+
+    // -------------- User Controllers --------------
+
+    @CrossOrigin
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public APIResponse getUsers(@RequestBody String json) {
+        return userController.getUsers(json);
     }
 
 
+    @CrossOrigin
     @RequestMapping("/get-by-code")
     //@ResponseBody
     public Country getByCode(String code) {
         return countryController.getByCode(code);
     }
 
+    @CrossOrigin
     @RequestMapping("/get-by-name")
     //@ResponseBody
     public Country getByName(String name) {
         return countryController.getByName(name);
     }
 
+    @CrossOrigin
     @RequestMapping("/delete")
     @ResponseBody
     public String delete(long id) {
         return countryController.delete(id);
     }
 
+    @CrossOrigin
     @RequestMapping("/create")
     @ResponseBody
     public String create(String code, String name) {
         return countryController.create(code, name);
     }
 
+    @CrossOrigin
     @RequestMapping("/update")
     @ResponseBody
     public String updateCountry(long id, String name) {

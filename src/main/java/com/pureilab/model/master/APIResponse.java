@@ -12,6 +12,8 @@ public class APIResponse {
 
     private String message = "";
 
+    private String token = "";
+
     private Object body = null;
 
     public String getCode() {
@@ -28,6 +30,14 @@ public class APIResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Object getBody() {

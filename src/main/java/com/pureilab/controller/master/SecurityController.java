@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 
 import javax.sound.midi.SysexMessage;
 
+import com.google.gson.JsonObject;
 /**
  * Created by Julian on 11/14/2016.
  *
@@ -37,7 +38,7 @@ import javax.sound.midi.SysexMessage;
  *
  */
 @Component
-public class SecurityController {
+public class SecurityController extends AbstractController  {
 
     // ------------------------
     @Autowired
@@ -63,6 +64,7 @@ public class SecurityController {
 
             // TODO: check if the user exists and data validation ..
             User storedUser = userDao.findByUsername(user.getUsername());
+
             if(storedUser != null) {
                 response.setCode("300");
                 response.setMessage("User name exists ...");
@@ -84,6 +86,7 @@ public class SecurityController {
                 response.setCode("200");
                 response.setMessage("Success");
                 response.setBody(user);
+
             }
         }
         catch (Exception ex) {
@@ -117,44 +120,51 @@ public class SecurityController {
             System.out.println("apiKey = " + request.getApiKey() );
             System.out.println("operator = " + request.getOperator());
             System.out.println("token = " + request.getToken());
-            System.out.println("params = " + request.getParams().length);
+            System.out.println("body = " + request.getBody().toString());
 
-            String params[] = request.getParams();
+            String body = request.getBody().toString();
 
             // TODO: Check API key and Token
 
-            System.out.println("params[0] = " + params[0]);
-            System.out.println("params[1] = " + params[1]);
+            User user = (User) APIRequest.parse(body, User.class);
 
-            String username = params[0];
-            String password = params[1];
+            System.out.println("id  = " + user.getId());
+            System.out.println("username = " + user.getUsername());
+            System.out.println("password = " + user.getPassword());
+
+            String username = user.getUsername();
+            String password =user.getPassword();
 
             //String hashedPassword =  User.getSaltedHash(params[1]);
             //User user = userDao.findByUsernameAndPassword(params[0], hashedPassword);
 
-            User user = userDao.findByUsername(params[0]);
-            if(user != null && User.check(password, user.getPassword())) {
+            User storedUser = userDao.findByUsername(username);
+            if(storedUser != null && User.check(password, storedUser.getPassword())) {
 
-                System.out.println("password: " + user.getPassword());
-                String token = jwtHelper.generateToken(user.getUsername());
+                System.out.println("password: " + storedUser.getPassword());
+                String token = jwtHelper.generateToken(storedUser.getUsername());
                 System.out.println("TOKEN: " + token);
                 response.setCode("200");
                 response.setMessage("Success");
+                response.setToken(token);
                 response.setBody(token);
             } else {
                 response.setCode("300");
                 response.setMessage("User name or password is invalid");
-                response.setBody(null);
+                response.setToken("");
+                response.setBody("");
             }
 
         } catch (SecurityException e) {
             response.setCode("300");
             response.setMessage(e.getMessage());
-            response.setBody(null);
+            response.setToken("");
+            response.setBody("");
         } catch (Exception e) {
             response.setCode("300");
             response.setMessage("Unknown problem");
-            response.setBody(null);
+            response.setToken("");
+            response.setBody("");
         }
 
         System.out.println(response.getBody());
@@ -181,14 +191,9 @@ public class SecurityController {
             System.out.println("apiKey = " + request.getApiKey() );
             System.out.println("operator = " + request.getOperator());
             System.out.println("token = " + request.getToken());
-            System.out.println("params = " + request.getParams().length);
-
-            String params[] = request.getParams();
+            System.out.println("body = " + request.getBody().toString());
 
             // TODO: Check API key and Token
-
-            System.out.println("params[0] = " + params[0]);
-            System.out.println("params[1] = " + params[1]);
 
             String token = request.getToken();
             String username = jwtHelper.getUsernameFromToken(token);
@@ -196,15 +201,17 @@ public class SecurityController {
             System.out.println("Created on: " + jwtHelper.getCreatedDateFromToken(token));
             System.out.println("Expired on: " + jwtHelper.getExpirationDateFromToken(token));
 
+            token = jwtHelper.refreshToken(token);
             response.setCode("200");
             response.setMessage("Success");
+            response.setToken(token);
             response.setBody("successfully complete the task");
-
         }
         catch (SecurityException e) {
             response.setCode("300");
             response.setMessage(e.getMessage());
-            response.setBody(null);
+            response.setToken("");
+            response.setBody("");
         }
 
         System.out.println(response.getBody());
@@ -234,7 +241,8 @@ public class SecurityController {
             //System.out.println("params = " + request.getParams().length);
             //String params[] = request.getParams();
 
-            // TODO: Check API key and Token
+            // TODO: Check API key
+            // TODO: Token (Jason Web Token: who makes the request?
 
 
             String token = request.getToken();
@@ -243,35 +251,25 @@ public class SecurityController {
             System.out.println("Created on: " + jwtHelper.getCreatedDateFromToken(token));
             System.out.println("Expired on: " + jwtHelper.getExpirationDateFromToken(token));
 
-            token = jwtHelper.generateToken(username);
+            //token = jwtHelper.generateToken(username);
+            token = jwtHelper.refreshToken(token);
 
             response.setCode("200");
             response.setMessage("Success");
-            response.setBody(token);
+            response.setToken(token);
+            response.setBody("");
 
         }
         catch (SecurityException e) {
             response.setCode("300");
             response.setMessage(e.getMessage());
-            response.setBody(null);
+            response.setToken("");
+            response.setBody("");
         }
 
         System.out.println(response.getBody());
 
         return response;
-    }
-
-    /**
-     * Validate API Key
-     * The current impleemntation: always return true.
-     * TODO:
-     * The future implementation can validate API keys against database table.
-     *
-     * @param apiKey
-     * @return
-     */
-    private boolean validateAPIKey(String apiKey) {
-            return true;
     }
 
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public interface CustomerDao extends PagingAndSortingRepository<Customer, Long> {
 //public interface CountryDao extends JpaRepository<Country, Long> {
 
-
+    public Customer save(Customer obj);
 }
 
 

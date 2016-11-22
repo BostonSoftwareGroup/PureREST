@@ -1,6 +1,7 @@
 package com.pureilab.model.master;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * Created by Julian on 10/31/2016.
@@ -15,7 +16,7 @@ public class APIRequest {
 
     private String operator = "";
 
-    private String[] params  = null;
+    private JsonObject body  = null;
 
     public String getApiKey() {
         return apiKey;
@@ -41,20 +42,21 @@ public class APIRequest {
         this.operator = operator;
     }
 
-    public String[] getParams() {
-        return params;
+    public JsonObject getBody() {
+        return body;
     }
 
-    public void setParams(String[] params) {
-        this.params = params;
+    public void setBody(JsonObject body) {
+        this.body = body;
     }
 
     public static APIRequest parse(String json) {
+        return (APIRequest) parse(json, APIRequest.class);
+    }
 
+    public static Object parse(String json, Class cls) {
         Gson gson = new Gson();
-        APIRequest request = gson.fromJson(json, APIRequest.class);
-
-        return request;
-
+        Object object = gson.fromJson(json, cls);
+        return object;
     }
 }
